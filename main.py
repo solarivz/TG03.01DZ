@@ -17,6 +17,25 @@ logger = logging.getLogger("school_bot")
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
+# Создание базы данных и таблицы students
+def init_db():
+    conn = sqlite3.connect('school_data.db')
+    cursor = conn.cursor()
+    cursor.execute('''CREATE TABLE IF NOT EXISTS students (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        name TEXT NOT NULL,
+                        age INTEGER NOT NULL,
+                        grade TEXT NOT NULL)''')
+    conn.commit()
+    conn.close()
+
+init_db()
+
+
+
+
+
+
 
 # Основная функция запуска бота
 async def main():
