@@ -64,6 +64,22 @@ async def get_age(message: Message, state: FSMContext):
     except ValueError:
         await message.answer("Возраст должен быть числом. Попробуй ещё раз.")
 
+# Обработчик класса
+@dp.message(Form.grade)
+async def get_grade(message: Message, state: FSMContext):
+    await state.update_data(grade=message.text)
+    user_data = await state.get_data()
+
+    # Сохранение данных в базу данных
+    conn = sqlite3.connect('school_data.db')
+    cursor = conn.cursor()
+    cursor.execute('''INSERT INTO students (name, age, grade) VALUES (?, ?, ?)''',
+                   (user_data['name'], user_data['age'], user_data['grade']))
+    conn.commit()
+    conn.close()
+
+    await message.answer(f"Спасибо! Данные сохранены:\nИмя: {user_data['name']}\nВозраст: {user_data['age']}\nКласс: {user_data['grade']}")
+    await state.clear()
 
 
 
