@@ -31,6 +31,38 @@ def init_db():
 
 init_db()
 
+# Класс состояний для FSM
+class Form(StatesGroup):
+    name = State()
+    age = State()
+    grade = State()
+
+# Обработчик команды /start
+@dp.message(CommandStart())
+async def start(message: Message, state: FSMContext):
+    await message.answer("Привет! Как тебя зовут?")
+    await state.set_state(Form.name)
+
+# Обработчик имени
+@dp.message(Form.name)
+async def get_name(message: Message, state: FSMContext):
+    await state.update_data(name=message.text)
+    await message.answer("Сколько тебе лет?")
+    await state.set_state(Form.age)
+
+# Обработчик возраста
+@dp.message(Form.age)
+async def get_age(message: Message, state: FSMContext):
+    try:
+        age = int(message.text)
+        if age <= 0:
+            await message.answer("Возраст должен быть положительным числом. Попробуй ещё раз.")
+            return
+        await state.update_data(age=age)
+        await message.answer("В каком ты классе?")
+        await state.set_state(Form.grade)
+    except ValueError:
+        await message.answer("Возраст должен быть числом. Попробуй ещё раз.")
 
 
 
